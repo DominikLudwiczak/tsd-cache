@@ -30,9 +30,9 @@ class TaskNo2Test {
     @Test
     void shouldIncrementFromZero() {
         //when
-        storage.increment("user1");
+        storage.increment("user2");
         //then
-        assertThat(storage.get("user1")).isEqualTo(1);
+        assertThat(storage.get("user2")).isEqualTo(1);
     }
 
     @Test

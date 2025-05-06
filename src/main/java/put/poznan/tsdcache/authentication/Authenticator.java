@@ -1,16 +1,20 @@
 package put.poznan.tsdcache.authentication;
 
-import lombok.RequiredArgsConstructor;
 import put.poznan.tsdcache.authentication.exceptions.BadCredentialsException;
 import put.poznan.tsdcache.authentication.exceptions.UserLockedOutException;
 
-@RequiredArgsConstructor
 public class Authenticator {
 
     private final BadLoginAttemptsStorage badLoginAttemptsStorage;
     private final PasswordChecker passwordChecker;
     // INFO: Threshold is set in configuration class
     private final Integer badLoginAttemptsThreshold;
+
+    public Authenticator(BadLoginAttemptsStorage badLoginAttemptsStorage, PasswordChecker passwordChecker, Integer badLoginAttemptsThreshold) {
+        this.badLoginAttemptsStorage = badLoginAttemptsStorage;
+        this.passwordChecker = passwordChecker;
+        this.badLoginAttemptsThreshold = badLoginAttemptsThreshold;
+    }
 
     void authenticate(String email, String password) {
         if (isLockedOut(email)) {
@@ -30,16 +34,17 @@ public class Authenticator {
     // TODO 1.1 - Finish this method using badLoginAttemptsStorage
     // TODO - TIP: Use email as a key
     private void increaseBadLoginAttemptsCounter(String email) {
-
+        badLoginAttemptsStorage.increment(email);
     }
 
     // TODO 1.1 - Finish this method using badLoginAttemptsStorage and badLoginAttemptsThreshold
     private boolean isLockedOut(String email) {
-        return false;
+        Integer attempts = badLoginAttemptsStorage.get(email);
+        return attempts != null && attempts >= badLoginAttemptsThreshold;
     }
 
     // TODO 1.1 - Finish this method using badLoginAttemptsStorage
     private void resetCounter(String email) {
-
+        badLoginAttemptsStorage.remove(email);
     }
 }

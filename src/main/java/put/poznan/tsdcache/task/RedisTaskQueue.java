@@ -3,6 +3,8 @@ package put.poznan.tsdcache.task;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.time.Duration;
+
 public class RedisTaskQueue implements TaskQueue {
 
     private final ListOperations<String, String> redisOperations;
@@ -14,19 +16,23 @@ public class RedisTaskQueue implements TaskQueue {
     // TODO 3.1 - Implement this method
     @Override
     public void push(String user, String task) {
-
+        redisOperations.rightPush(getKey(user), task);
     }
 
     // TODO 3.1 - Implement this method
     @Override
     public String pop(String user) {
-        return "";
+        String task = redisOperations.leftPop(getKey(user));
+        if (task != null) {
+            redisOperations.getOperations().expire(getKey(user), Duration.ofDays(1));
+        }
+        return task;
     }
 
     // TODO 3.1 - Implement this method
     @Override
     public void clear(String user) {
-
+        redisOperations.getOperations().delete(getKey(user));
     }
 
     // --- NOTICE ---
